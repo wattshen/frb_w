@@ -1,0 +1,87 @@
+　　1、在ubuntu中安装git
+$ sudo apt-get install git git-core
+
+　　2、配置本机的git
+$ git config --global user.name "abcd"
+$ git config --global user.email abcd@efgh.com
+
+　　3、生成密钥
+$ ssh-keygen -t rsa -C "abcd@efgh.com" //邮箱同上
+
+　　4、提交密钥
+vim /home/linx/.ssh/id_rsa.pub //复制里面的密钥
+　　到github网页中登陆自己的账号，然后再account setting中，找到SSH KEY讲复制的密钥加入（需要再次输入github的密码）
+
+　　5、检验是否链接上了github
+$ ssh git@github.com
+//正常情况下，回显如下
+PTY allocation request failed on channel 0
+Hi plinx! You've successfully authenticated, but GitHub does not provide shell access.
+Connection to github.com closed.
+
+　　6、首次推送
+复制代码
+$ mkdir tmp      //创建推送目录
+$ cd tmp         //进入推送目录    
+$ git init       //设置该目录为推送
+$ touch README   //生成readme
+$ git add README //加入修改列表
+$ git commit -m 'first commit' //递交修改声明
+$ git remote add origin git@github.com:abcd/tmp.git //为远程Git更名为origin,可由github复制得来
+$ git push -u origin master //推送此次修改，第一次加　-u，部分销声错误时加-f
+复制代码
+　　然后各种问题从这里开始了，以下谈一下解决的方法：
+
+ 
+
+　　问题一：
+
+ERROR: Repository not found.
+　　这个问题是因为在你推送的github账户中，并没有这个Repository。
+
+　　解决方法：
+
+　　1）检查自己的github中的Repository，检查自己创建的目录，必须要两者一致；
+
+　　2）先git clone下github中的Repository，然后再进行更改，这样就一定一致了。
+
+　　问题二：
+
+Agent admitted failure to sign using the key. 
+Permission denied (publickey)
+　　这个问题是因为你的ssh key并没有加入到你想git的github账户的ssh key中，所以没有访问权限。
+
+　　解决方法：
+
+　　1）重新拷贝一份当前的~/.ssh/id_rsa.pub中的ssh key到github中添加;
+
+　　2）先删除~/.ssh/in_rsa*文件，然后重新ssh-keygen一份sshkey来生成密钥，然后复制到github，接着ssh链接github来检验是否成功联通。
+
+　　问题三：
+
+//出现如下提示
+! [rejected] master -> master (non-fast-forward)
+error: failed to push some refs to ...
+　　这个问题是因为，github中已经有了这个代码，不允许你覆盖它。
+
+　　解决方法：
+
+　　1）强制推送，一般不推荐！
+$ git push -f
+
+　　2）
+$ git pull
+　　然后将出现其他提示，具体意思是说branch与merge未指定，git无法选择要推送的分支。
+
+　　可以通过修改 .git/config文件中的下列内容
+
+[branch "master"]
+    remote = origin
+    merge = refs/heads/master
+　　也可以直接命令行修改
+
+$ git config branch.master.remote origin
+$ git config branch.master.merge ref/heads/master
+　　目前了解到的也就这三个问题了。
+
+　　之后就可以成功得推送了。
