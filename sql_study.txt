@@ -1,0 +1,126 @@
+#启动、登录、退出
+#-------------------------+++++++++++++++++++++++++---------------------------
+#启动
+#net start mysql;
+
+#退出
+#quit
+
+#登录
+#mysql -h127.0.0.1 -uroot -p;
+#-------------------------+++++++++++++++++++++++++---------------------------
+
+
+
+#用户、密码与权限
+#-------------------------+++++++++++++++++++++++++---------------------------
+#新增用户
+#INSERT INTO mysql.user(HOST,USER,PASSWORD)VALUES("localhost","watt","PASSWORD(watt000)");
+#CREATE USER foo@localhost IDENTIFIED BY '123';
+
+#更新密码
+#UPDATE mysql.user SET PASSWORD = password("watt000"), Select_priv = "Y" WHERE user = "watt";
+
+#修改root帐户的密码
+#SET PASSWORD FOR 'username'@'host' = PASSWORD('newpassword')
+#set password for root@localhost = password('123456');
+
+#如果是当前登陆用户
+#SET PASSWORD = PASSWORD("newpassword");
+
+/*
+GRANT privileges ON databasename.tablename TO 'username'@'host';
+GRANT SELECT, UPDATE, INSERT, CREATE ON *.* TO watt@localhost;
+GRANT * on *.* TO watt@locallhost;
+flush privileges;
+*/
+
+#删除用户
+#Delete FROM user Where User='test' and Host='localhost';
+#mysql>flush privileges;
+#mysql>drop database testDB; //删除用户的数据库
+
+#删除账户及权限
+#drop user 用户名@'%';
+#drop user 用户名@ localhost; 
+#-------------------------+++++++++++++++++++++++++---------------------------
+
+
+
+#库
+#-------------------------+++++++++++++++++++++++++---------------------------
+#创建库
+#CREATE database database_name;
+
+#选择并使用库
+#use database_name;
+
+#列出所有库
+#show databases;
+
+#删除库
+#drop database database_name;
+
+#查看数据库有哪些表
+#show tables;
+
+#-------------------------+++++++++++++++++++++++++---------------------------
+
+
+
+#表
+#-------------------------+++++++++++++++++++++++++---------------------------
+#创建表
+/*
+CREATE TABLE IF NOT EXISTS person (
+number INT(11),
+name VARCHAR(255),
+birthday DATE
+);
+*/
+
+#创建临时表
+/*
+CREATE TEMPORARY TABLE person (
+number INT(11),
+name VARCHAR(255),
+birthday DATE
+);
+*/
+
+#删除表
+#drop table table_name;
+
+#查看表结构
+#describe table_name;
+#-------------------------+++++++++++++++++++++++++---------------------------
+
+
+
+#增删改查
+#-------------------------+++++++++++++++++++++++++---------------------------
+#新增记录
+#insert into table_name values(字段名,字段值);  
+#insert into table_name(字段1,字段2) values(字段1,字段2)  
+
+#删除记录
+#delete from table_name;  
+#delete from table_name where id=1;   
+#删数据库：drop database 数据库名;  
+#删除表：drop table table_name;  
+#删除表中的列:alter table table_name drop column 列名; 
+
+#更新记录  
+#修改所有：updata table_name set 列名='新的值，非数字加单引号' ;  
+#带条件的修改：updata table_name set 列名='新的值，非数字加单引号' where id=6;  
+
+#查询记录
+#查询所有的数据
+#select *from table_name;  
+
+#带条件的查询：  
+#select *from table_name where 列名=条件值;  
+#Select * from table_name where 列名 not like（like） '字符值'  
+#分页查询
+#select *from table_name limit 每页数量 offset 偏移量;  
+#-------------------------+++++++++++++++++++++++++---------------------------
