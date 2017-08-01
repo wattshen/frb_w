@@ -1,4 +1,4 @@
-　　1、在ubuntu中安装git
+﻿　　1、在ubuntu中安装git
 $ sudo apt-get install git git-core
 
 　　2、配置本机的git
@@ -85,3 +85,477 @@ $ git config branch.master.merge ref/heads/master
 　　目前了解到的也就这三个问题了。
 
 　　之后就可以成功得推送了。
+
+
+
+
+
+
+
+
+
+当我们需要删除暂存区或分支上的文件, 同时工作区也不需要这个文件了, 可以使用
+
+1 git rm file_path
+2 git commit -m 'delete somefile'
+3 git push
+当我们需要删除暂存区或分支上的文件, 但本地又需要使用, 只是不希望这个文件被版本控制, 可以使用
+
+git rm --cached file_path
+git commit -m 'delete remote somefile'
+git push
+
+
+
+
+git设置关闭自动换行
+
+git config --global core.autocrlf false
+为了保证文件的换行符是以安全的方法，避免windows与unix的换行符混用的情况，最好也加上这么一句
+git config --global core.safecrlf true
+
+git tag 使用
+
+git tag  # 列出当前仓库的所有标签
+git tag -l 'v0.1.*'  # 搜索符合当前模式的标签
+
+git tag v0.2.1-light  # 创建轻量标签
+git tag -a v0.2.1 -m '0.2.1版本'  # 创建附注标签
+
+git checkout [tagname]  # 切换到标签
+git show v0.2.1  # 查看标签版本信息
+
+git tag -d v0.2.1  # 删除标签
+git tag -a v0.2.1 9fbc3d0  # 补打标签
+
+git push origin v0.1.2  # 将v0.1.2标签提交到git服务器
+git push origin –tags  # 将本地所有标签一次性提交到git服务器
+git tag  # 查看当前分支下的标签
+怎样遍历移除项目中的所有 .pyc 文件
+
+sudo find /tmp -name "*.pyc" | xargs rm -rf替换/tmp目录为工作目录
+git rm *.pyc这个用着也可以
+
+避免再次误提交，在项目新建.gitignore文件，输入*.pyc过滤文件
+
+以上2015/12/20更新
+
+创建和使用git ssh key
+
+首先设置git的user name和email：
+
+git config --global user.name "xxx"
+git config --global user.email "xxx@gmail.com"
+查看git配置：
+
+git config --list
+然后生成SHH密匙：
+
+查看是否已经有了ssh密钥：cd ~/.ssh
+如果没有密钥则不会有此文件夹，有则备份删除
+生存密钥：
+
+ssh-keygen -t rsa -C "xxx@gmail.com"
+按3个回车，密码为空这里一般不使用密钥。
+最后得到了两个文件：id_rsa和id_rsa.pub
+注意：密匙生成就不要改了，如果已经生成到~/.ssh文件夹下去找。
+
+git变更项目地址
+
+git remote set-url origin git@192.168.6.70:res_dev_group/test.git
+git remote -v
+查看某个文件的修改历史
+
+git log --pretty=oneline 文件名 # 显示修改历史
+git show 356f6def9d3fb7f3b9032ff5aa4b9110d4cca87e # 查看更改
+
+git push 时报错 warning: push.default is unset;
+
+'matching'参数是 Git 1.x 的默认行为，其意是如果你执行 git push 但没有指定分支，它将 push 所有你本地的分支到远程仓库中对应匹配的分支。而 Git 2.x 默认的是 simple，意味着执行 git push 没有指定分支时，只有当前分支会被 push 到你使用 git pull 获取的代码。
+根据提示，修改git push的行为:
+git config --global push.default matching
+再次执行git push 得到解决。
+
+git submodule的使用拉子项目代码
+
+开发过程中，经常会有一些通用的部分希望抽取出来做成一个公共库来提供给别的工程来使用，而公共代码库的版本管理是个麻烦的事情。今天无意中发现了git的git submodule命令，之前的问题迎刃而解了。
+添加
+
+为当前工程添加submodule，命令如下：
+
+git submodule add 仓库地址 路径
+
+其中，仓库地址是指子模块仓库地址，路径指将子模块放置在当前工程下的路径。
+注意：路径不能以 / 结尾（会造成修改不生效）、不能是现有工程已有的目录（不能順利 Clone）
+
+命令执行完成，会在当前工程根路径下生成一个名为“.gitmodules”的文件，其中记录了子模块的信息。添加完成以后，再将子模块所在的文件夹添加到工程中即可。
+删除
+
+submodule的删除稍微麻烦点：首先，要在“.gitmodules”文件中删除相应配置信息。然后，执行git rm –cached命令将子模块所在的文件从git中删除。
+下载的工程带有submodule
+
+当使用git clone下来的工程中带有submodule时，初始的时候，submodule的内容并不会自动下载下来的，此时，只需执行如下命令：
+
+git submodule update --init --recursive
+
+即可将子模块内容下载下来后工程才不会缺少相应的文件。
+
+git add文件取消
+
+在git的一般使用中，如果发现错误的将不想提交的文件add进入index之后，想回退取消，则可以使用命令：git reset HEAD <file>...，同时git add完毕之后，git也会做相应的提示。
+
+http://blog.csdn.net/yaoming168/article/details/38777763
+
+git删除文件：
+
+删除文件跟踪并且删除文件系统中的文件file1git rm file1
+提交刚才的删除动作，之后git不再管理该文件git commit
+
+删除文件跟踪但不删除文件系统中的文件file1git rm --cached file1
+提交刚才的删除动作，之后git不再管理该文件。但是文件系统中还是有file1。git commit
+
+版本回退
+
+版本回退用于线上系统出现问题后恢复旧版本的操作。
+回退到的版本git reset --hard 248cba8e77231601d1189e3576dc096c8986ae51
+回退的是所有文件，如果后悔回退可以git pull就可以了。
+
+历史版本对比
+
+查看日志git log
+查看某一历史版本的提交内容git show 4ebd4bbc3ed321d01484a4ed206f18ce2ebde5ca，这里能看到版本的详细修改代码。
+对比不同版本git diff c0f28a2ec490236caa13dec0e8ea826583b49b7a 2e476412c34a63b213b735e5a6d90cd05b014c33
+
+http://blog.csdn.net/lxlzhn/article/details/9356473
+
+分支的意义与管理
+
+创建分支可以避免提交代码后对主分支的影响，同时也使你有了相对独立的开发环境。分支具有很重要的意义。
+创建并切换分支，提交代码后才能在其它机器拉分支代码git checkout -b new_branch
+查看当前分支git branch
+切换到master分支git checkout master
+合并分支到当前分支git merge new_branch，合并分支的操作是从new_branch合并到master分支，当前环境在master分支。
+删除分支git branch -d new_branch
+
+git冲突文件编辑
+
+冲突文件冲突的地方如下面这样
+
+a123
+<<<<<<< HEAD
+b789
+=======
+b45678910
+>>>>>>> 6853e5ff961e684d3a6c02d4d06183b5ff330dcc
+c
+冲突标记<<<<<<< （7个<）与=======之间的内容是我的修改，=======与>>>>>>>之间的内容是别人的修改。
+此时，还没有任何其它垃圾文件产生。
+你需要把代码合并好后重新走一遍代码提交流程就好了。
+
+不顺利的代码提交流程
+
+在git push后出现错误可能是因为其他人提交了代码，而使你的本地代码库版本不是最新。
+这时你需要先git pull代码后，检查是否有文件冲突。
+没有文件冲突的话需要重新走一遍代码提交流程add —> commit —> push。
+解决文件冲突在后面说。
+
+git顺利的提交代码流程
+
+查看修改的文件git status；
+为了谨慎检查一下代码git diff；
+添加修改的文件git add dirname1/filename1.py dirname2/filenam2.py，新加的文件也是直接add就好了；
+添加修改的日志git commit -m "fixed:修改了上传文件的逻辑"；
+提交代码git push，如果提交失败的可能原因是本地代码库版本不是最新。
+
+理解github的pull request
+
+有一个仓库，叫Repo A。你如果要往里贡献代码，首先要Fork这个Repo，于是在你的Github账号下有了一个Repo A2,。然后你在这个A2下工作，Commit，push等。然后你希望原始仓库Repo A合并你的工作，你可以在Github上发起一个Pull Request，意思是请求Repo A的所有者从你的A2合并分支。如果被审核通过并正式合并，这样你就为项目A做贡献了。
+
+http://zhidao.baidu.com/question/1669154493305991627.html
+
+一些错误处理
+
+"pathspec 'branch' did not match any file(s) known to git."错误
+
+git checkout master
+git pull
+git checkout new_branch
+使用git提交比较大的文件的时候可能会出现这个错误
+
+error: RPC failed; result=22, HTTP code = 411
+fatal: The remote end hung up unexpectedly
+fatal: The remote end hung up unexpectedly
+Everything up-to-date
+
+这样的话首先改一下git的传输字节限制
+
+git config http.postBuffer 524288000
+然后这时候在传输或许会出现另一个错误
+
+error: RPC failed; result=22, HTTP code = 413
+fatal: The remote end hung up unexpectedly
+fatal: The remote end hung up unexpectedly
+Everything up-to-date
+
+这两个错误看上去相似，一个是411，一个是413
+
+下面这个错误添加一下密钥就可以了
+
+首先key-keygen 生成密钥
+
+然后把生成的密钥复制到git中自己的账号下的相应位置
+
+git push ssh://192.168.64.250/eccp.git branch
+
+@创建人: pyer
+@时 间: 2015-08-23
+@描 述: 这些git技能够你用一年了
+@地 址: http://www.cnblogs.com/pyer/p/4752770.html
+
+
+
+
+
+在Git的一般使用中，如果发现错误的将不想提交的文件add进入index之后，想回退取消，则可以使用命令：git reset HEAD <file>...，同时git add完毕之后，git也会做相应的提示，比如：
+
+引用
+
+ 
+
+# Changes to be committed: 
+
+#   (use "git reset HEAD<file>..." to unstage) 
+
+# 
+
+# new file:   Test.Scala 
+
+ 
+
+git reset [--hard|soft|mixed|merge|keep] [<commit>或HEAD]：将当前的分支重设（reset）到指定的<commit>或者HEAD（默认，如果不显示指定commit，默认是HEAD，即最新的一次提交），并且根据[mode]有可能更新index和working directory。
+
+下面列出一些git reset的典型的应用场景： 
+
+A) 回滚add操纵 
+
+引用
+
+$ edit                                   (1) 
+
+$ git add frotz.c filfre.c 
+
+$ mailx                                  (2) 
+
+$ git reset                              (3) 
+
+$ git pull git://info.example.com/ nitfol (4) 
+
+ 
+
+(1) 编辑文件frotz.c, filfre.c，做了些更改，并把更改添加到了index 
+
+(2) 查看邮件，发现某人要你pull，有一些改变需要你merge下来 
+
+(3) 然而，你已经把index搞乱了，因为index同HEAD commit不匹配了，但是你知道，即将pull的东西不会影响已经修改的frotz.c和filfre.c，因此你可以revert这两个文件的改变。revert后，那些改变应该依旧在working directory中，因此执行git reset。 
+
+(4) 然后，执行了pull之后，自动merge，frotz.c和filfre.c这些改变依然在working directory中。 
+
+ 
+
+B) 回滚最近一次commit 
+
+引用
+
+$ git commit ... 
+
+$ git reset --soft HEAD^     (1) 
+
+$ edit                       (2) 
+
+$ git commit -a -c ORIG_HEAD (3) 
+
+ 
+
+(1) 当提交了之后，你又发现代码没有提交完整，或者你想重新编辑一下提交的comment，执行git reset --soft HEAD^，让working tree还跟reset之前一样，不作任何改变。 
+
+HEAD^指向HEAD之前最近的一次commit。 
+
+(2) 对working tree下的文件做修改 
+
+(3) 然后使用reset之前那次commit的注释、作者、日期等信息重新提交。注意，当执行git reset命令时，git会把老的HEAD拷贝到文件.git/ORIG_HEAD中，在命令中可以使用ORIG_HEAD引用这个commit。commit 命令中 -a 参数的意思是告诉git，自动把所有修改的和删除的文件都放进stage area，未被git跟踪的新建的文件不受影响。commit命令中-c <commit> 或者 -C <commit>意思是拿已经提交的commit对象中的信息（作者，提交者，注释，时间戳等）提交，那么这条commit命令的意思就非常清晰了，把所有更改的文件加入stage area，并使用上次的提交信息重新提交。 
+
+ 
+
+C) 回滚最近几次commit，并把这几次commit放到叫做topic的branch上去。 
+
+引用
+
+$ git branch topic/wip    (1) 
+
+$ git reset --hard HEAD~3  (2) 
+
+$ git checkout topic/wip   (3)
+
+ 
+
+(1) 你已经提交了一些commit，但是此时发现这些commit还不够成熟，不能进入master分支，但你希望在新的branch上润色这些commit改动。因此执行了git branch命令在当前的HEAD上建立了新的叫做 topic/wip的分支。 
+
+(2) 然后回滚master branch上的最近三次提交。HEAD~3指向当前HEAD-3个commit的commit，git reset --hard HEAD~3即删除最近的三个commit（删除HEAD, HEAD^, HEAD~2），将HEAD指向HEAD~3。 
+
+ 
+
+D) 永久删除最后几个commit 
+
+引用
+
+$ git commit ... 
+
+$ git reset --hard HEAD~3   (1)
+
+ 
+
+(1) 最后三个commit（即HEAD, HEAD^和HEAD~2）提交有问题，你想永久删除这三个commit。 
+
+ 
+
+E) 回滚merge和pull操作 
+
+引用
+
+$ git pull                        (1) 
+
+Auto-merging nitfol 
+
+CONFLICT (content): Merge conflict innitfol 
+
+Automatic merge failed; fix conflicts andthen commit the result. 
+
+$ git reset --hard                (2) 
+
+$ git pull . topic/branch         (3) 
+
+Updating from 41223... to 13134... 
+
+Fast-forward 
+
+$ git reset --hard ORIG_HEAD      (4)
+
+ 
+
+(1) 从origin拉下来一些更新，但是产生了很多冲突，你暂时没有这么多时间去解决这些冲突，因此你决定稍候有空的时候再重新pull。 
+
+(2) 由于pull操作产生了冲突，因此所有pull下来的改变尚未提交，仍然再stage area中，这种情况下git reset --hard 与 git reset --hard HEAD意思相同，即都是清除index和working tree中被搞乱的东西。 
+
+(3) 将topic/branch合并到当前的branch，这次没有产生冲突，并且合并后的更改自动提交。 
+
+(4) 但是此时你又发现将topic/branch合并过来为时尚早，因此决定退滚merge，执行git reset --hard ORIG_HEAD回滚刚才的pull/merge操作。说明：前面讲过，执行git reset时，git会把reset之前的HEAD放入.git/ORIG_HEAD文件中，命令行中使用ORIG_HEAD引用这个commit。同样的，执行pull和merge操作时，git都会把执行操作前的HEAD放入ORIG_HEAD中，以防回滚操作。 
+
+ 
+
+F) 在被污染的working tree中回滚merge或者pull 
+
+引用
+
+$ git pull                        (1) 
+
+Auto-merging nitfol 
+
+Merge made by recursive. 
+
+nitfol               |   20 +++++---- 
+
+... 
+
+$ git reset --merge ORIG_HEAD     (2)
+
+ 
+
+(1) 即便你已经在本地更改了一些你的working tree，你也可安全的git pull，前提是你知道将要pull的内容不会覆盖你的working tree中的内容。 
+
+(2) git pull完后，你发现这次pull下来的修改不满意，想要回滚到pull之前的状态，从前面的介绍知道，我们可以执行git reset --hard ORIG_HEAD，但是这个命令有个副作用就是清空你的working tree，即丢弃你的本地未add的那些改变。为了避免丢弃working tree中的内容，可以使用git reset --merge ORIG_HEAD，注意其中的--hard 换成了 --merge，这样就可以避免在回滚时清除working tree。 
+
+ 
+
+G) 被中断的工作流程 
+
+在实际开发中经常出现这样的情形：你正在开发一个大的feature，此时来了一个紧急的bug需要修复，但是目前在working tree中的内容还没有成型，还不足以commit，但是你又必须切换的另外的branch去fix bug。请看下面的例子 
+
+引用
+
+$ git checkout feature ;# you were workingin "feature" branch and 
+
+$ work work work       ;#got interrupted 
+
+$ git commit -a -m "snapshot WIP"                (1) 
+
+$ git checkout master 
+
+$ fix fix fix 
+
+$ git commit ;# commit with real log 
+
+$ git checkout feature 
+
+$ git reset --soft HEAD^ ;# Go back to WIPstate  (2) 
+
+$ git reset                                     (3)
+
+ 
+
+(1) 这次属于临时提交，因此随便添加一个临时注释即可。 
+
+(2) 这次reset删除了WIP commit，并且把working tree设置成提交WIP快照之前的状态。 
+
+(3) 此时，在index中依然遗留着“snapshot WIP”提交时所做的uncommit changes，git reset将会清理index成为尚未提交"snapshot WIP"时的状态便于接下来继续工作。 
+
+ 
+
+(H) Reset单独的一个文件 
+
+假设你已经添加了一个文件进入index，但是而后又不打算把这个文件提交，此时可以使用git reset把这个文件从index中去除。 
+
+引用
+
+$ git reset -- frotz.c                     (1) 
+
+$ git commit -m "Commit files inindex"     (2) 
+
+$ git add frotz.c                          (3)
+
+ 
+
+(1) 把文件frotz.c从index中去除， 
+
+(2) 把index中的文件提交 
+
+(3) 再次把frotz.c加入index 
+
+ 
+
+(I) 保留working tree并丢弃一些之前的commit 
+
+假设你正在编辑一些文件，并且已经提交，接着继续工作，但是现在你发现当前在working tree中的内容应该属于另一个branch，与这之前的commit没有什么关系。此时，你可以开启一个新的branch，并且保留着working tree中的内容。 
+
+引用
+
+$ git tag start 
+
+$ git checkout -b branch1 
+
+$ edit 
+
+$ git commit ...                          (1) 
+
+$ edit 
+
+$ git checkout -b branch2                  (2) 
+
+$ git reset --keep start                   (3)
+
+ 
+
+(1) 这次是把在branch1中的改变提交了。 
+
+(2) 此时发现，之前的提交不属于这个branch，此时你新建了branch2，并切换到了branch2上。 
+
+(3) 此时你可以用reset --keep把在start之后的commit清除掉，但是保持working tree不变。 
